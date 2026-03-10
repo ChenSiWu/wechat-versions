@@ -76,7 +76,7 @@ def fetch_download_link() -> str:
             str: 下载链接 URL
     """
     # Fetch HTML and extract the first download link on the page.
-    with urllib.request.urlopen(WEBSITE_URL, timeout=30) as response:
+    with urllib.request.urlopen(WEBSITE_URL) as response:
         html = response.read().decode("utf-8", errors="replace")
     parser = DownloadLinkParser()
     parser.feed(html)
@@ -98,7 +98,7 @@ def fetch_head_metadata(url: str) -> dict[str, str]:
     for attempt in range(1, attempts + 1):
         try:
             request = urllib.request.Request(url, method="HEAD")
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request) as response:
                 return {key.lower(): value.strip() for key, value in response.headers.items()}
         except Exception as exc:
             last_error = exc
@@ -132,8 +132,6 @@ def download_with_retry(url: str, dest: Path) -> None:
                     "--waitretry",
                     "5",
                     "--retry-connrefused",
-                    "--timeout",
-                    "30",
                     url,
                     "-O",
                     str(dest),
